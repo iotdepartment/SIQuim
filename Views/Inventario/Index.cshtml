@@ -2,186 +2,158 @@
     ViewData["Title"] = "Control de Inventarios";
 }
 
-<div class="mx-auto mb-5 mt-10 w-full max-w-4xl rounded-lg bg-white p-6 shadow-lg">
+<script src="https://cdn.tailwindcss.com"></script>
 
-    <h1 class="mb-6 text-2xl font-bold text-gray-800">
-        Sistema de Control de Inventarios
-    </h1>
+<div class="container mx-auto mt-10 max-w-6xl rounded-lg bg-white p-6 shadow-lg">
+    <h1 class="mb-6 text-2xl font-bold text-gray-800">Sistema de Control de Inventarios</h1>
 
-    <!-- CONTENEDOR PRINCIPAL: IZQUIERDA (input) + DERECHA (info empleado) -->
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-
-        <!-- IZQUIERDA: Input para número de empleado -->
-        <div>
-            <label class="mb-2 block font-semibold text-gray-700">Número de empleado</label>
-            <input id="numEmpleado" type="text"
-                   class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                   placeholder="Ingresa el número de empleado" />
-
-            <button id="btnBuscarEmpleado"
-                    class="mt-3 w-full rounded-lg bg-blue-600 py-2 text-white transition hover:bg-blue-700">
-                Buscar empleado
-            </button>
-        </div>
-
-        <!-- DERECHA: Datos del empleado -->
-        <div id="empleadoInfo" class="hidden rounded-lg border bg-gray-50 p-4">
-            <div class="flex items-center gap-4">
-                <img id="empleadoFoto" src="" alt="Foto TM"
-                     class="h-20 w-20 rounded-full border object-cover" />
-
-                <div>
-                    <p class="text-lg font-semibold text-gray-800">
-                        <span id="empleadoNombre"></span>
-                    </p>
-                    <p class="text-gray-600">Empleado: <span id="empleadoNumero"></span></p>
-                    <p class="text-gray-600">Puesto: <span id="empleadoPuesto"></span></p>
-                </div>
-            </div>
-        </div>
-
+    <!-- Input para número de empleado -->
+    <div class="mb-6">
+        <label for="empleadoScan" class="mb-2 block font-semibold text-gray-700">Número de empleado</label>
+        <input id="empleadoScan" type="text"
+               class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500"
+               placeholder="Escanea tu número de empleado" autofocus />
     </div>
 
-    <!-- SECCIÓN DE MATERIAL EN 3 FILAS -->
-    <div id="materialSection" class="mt-8 hidden space-y-6">
-
-        <!-- FILA 1 -->
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <!-- Info empleado -->
+    <div id="empleadoInfo" class="mb-6 hidden rounded-lg border bg-gray-50 p-4">
+        <div class="flex items-center gap-4">
+            <img id="empleadoFoto" src="/images/user.png" alt="Foto TM"
+                 class="h-20 w-20 rounded-full border object-cover" />
             <div>
-                <label class="mb-2 block font-semibold text-gray-700">Material</label>
-                <input id="material1" type="text"
-                       class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                       placeholder="Código o nombre del material" />
-            </div>
-
-            <div>
-                <label class="mb-2 block font-semibold text-gray-700">Cantidad</label>
-                <input id="cantidad1" type="number"
-                       class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                       placeholder="Cantidad" />
+                <p class="text-lg font-semibold text-gray-800">
+                    <span id="empleadoNombre"></span>
+                </p>
+                <p class="text-gray-600">Empleado: <span id="empleadoNumero"></span></p>
+                <p class="text-gray-600">Área: <span id="empleadoArea"></span></p>
+                <p class="text-gray-600">Categoría: <span id="empleadoCategoria"></span></p>
             </div>
         </div>
-
-        <!-- FILA 2 -->
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div>
-                <label class="mb-2 block font-semibold text-gray-700">Material</label>
-                <input id="material2" type="text"
-                       class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                       placeholder="Código o nombre del material" />
-            </div>
-
-            <div>
-                <label class="mb-2 block font-semibold text-gray-700">Cantidad</label>
-                <input id="cantidad2" type="number"
-                       class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                       placeholder="Cantidad" />
-            </div>
-        </div>
-
-        <!-- FILA 3 -->
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div>
-                <label class="mb-2 block font-semibold text-gray-700">Material</label>
-                <input id="material3" type="text"
-                       class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                       placeholder="Código o nombre del material" />
-            </div>
-
-            <div>
-                <label class="mb-2 block font-semibold text-gray-700">Cantidad</label>
-                <input id="cantidad3" type="number"
-                       class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                       placeholder="Cantidad" />
-            </div>
-        </div>
-
-        <!-- OBSERVACIONES -->
-        <div>
-            <label class="mb-2 block font-semibold text-gray-700">Observaciones</label>
-            <textarea id="obsInput"
-                      class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                      placeholder="Notas adicionales (opcional)"></textarea>
-        </div>
-
-        <!-- BOTÓN + MENSAJE -->
-        <div>
-            <button id="btnEnviarMaterial"
-                    class="w-full rounded-lg bg-green-600 py-2 text-white transition hover:bg-green-700">
-                Capturar material
-            </button>
-
-            <div id="successMessage"
-                 class="mt-4 hidden rounded-lg border border-green-300 bg-green-100 p-4 text-green-800">
-                ✔ Material capturado con éxito
-            </div>
-        </div>
-
     </div>
 
+    <!-- Input para Kanban -->
+    <div id="kanbanSection" class="mb-6 hidden">
+        <label for="kanbanScan" class="mb-2 block font-semibold text-gray-700">Escanea Kanban</label>
+        <input id="kanbanScan" type="text"
+               class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500"
+               placeholder="Escanea código Kanban" />
+    </div>
+
+    <!-- Tabla de productos escaneados -->
+    <div id="productosSection" class="hidden">
+        <table class="min-w-full border border-gray-300 text-left text-sm">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="border px-4 py-2">Cantidad</th>
+                    <th class="border px-4 py-2">Imagen</th>
+                    <th class="border px-4 py-2">Descripción</th>
+                    <th class="border px-4 py-2">Kanban</th>
+                    <th class="border px-4 py-2">Part Number</th>
+                    <th class="border px-4 py-2">UOM</th>
+                    <th class="border px-4 py-2">StdPack</th>
+                </tr>
+            </thead>
+            <tbody id="productosBody"></tbody>
+        </table>
+    </div>
 </div>
 
 @section Scripts {
-
     <script>
-        const inputEmpleado = document.getElementById("numEmpleado");
-        const btnBuscar = document.getElementById("btnBuscarEmpleado");
+        let productos = {};
 
-        // Cuando se presione Enter en el input
-        inputEmpleado.addEventListener("keypress", function (event) {
+        // Badge de UOM
+        function renderUOMBadge(uom) {
+            if (!uom) return "";
+            let colorClass = "bg-gray-200 text-gray-800";
+            switch (uom.toUpperCase()) {
+                case "GA": colorClass = "bg-blue-100 text-blue-800"; break;
+                case "EA": colorClass = "bg-green-100 text-green-800"; break;
+                case "KG": colorClass = "bg-yellow-100 text-yellow-800"; break;
+                case "LT": colorClass = "bg-purple-100 text-purple-800"; break;
+            }
+            return `<span class="${colorClass} rounded-full px-2 py-1 text-xs font-semibold">${uom}</span>`;
+        }
+
+        // Renderizar tabla
+        function renderTabla() {
+            const body = document.getElementById("productosBody");
+            body.innerHTML = "";
+            Object.values(productos).forEach(p => {
+                const imgPath = p.imageUrl ? `/images/materiales/${p.imageUrl}` : `/images/materiales/default.png`;
+                body.innerHTML += `
+                    <tr>
+                        <td class="border px-4 py-2">x${p.count}</td>
+                        <td class="border px-4 py-2"><img src="${imgPath}" class="h-12 w-12 rounded border object-cover" /></td>
+                        <td class="border px-4 py-2">${p.description}</td>
+                        <td class="border px-4 py-2">${p.kanban}</td>
+                        <td class="border px-4 py-2">${p.partNumber}</td>
+                        <td class="border px-4 py-2">${renderUOMBadge(p.uom)}</td>
+                        <td class="border px-4 py-2">${p.stdPack}</td>
+                    </tr>`;
+            });
+        }
+
+        // Escaneo de empleado
+        document.getElementById("empleadoScan").addEventListener("keyup", function (event) {
             if (event.key === "Enter") {
-                event.preventDefault(); // evita que se intente enviar un form
-                btnBuscar.click();      // simula el click en el botón
+                const code = this.value.trim();
+                if (code !== "") {
+                    fetch(`/Inventario/BuscarEmpleado?numeroDeEmpleado=${code}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                document.getElementById("empleadoNombre").textContent = data.nombre;
+                                document.getElementById("empleadoNumero").textContent = data.numero;
+                                document.getElementById("empleadoArea").textContent = data.area;
+                                document.getElementById("empleadoCategoria").textContent = data.categoria;
+
+                                document.getElementById("empleadoInfo").classList.remove("hidden");
+                                document.getElementById("kanbanSection").classList.remove("hidden");
+                                document.getElementById("productosSection").classList.remove("hidden");
+
+                                document.getElementById("kanbanScan").focus();
+                            } else {
+                                alert(data.error || "Empleado no encontrado");
+                            }
+                        });
+                }
             }
         });
-    </script>
 
-    <script>
-        document.getElementById("btnBuscarEmpleado").addEventListener("click", function () {
-            const num = document.getElementById("numEmpleado").value;
+        // Escaneo de Kanban
+        document.getElementById("kanbanScan").addEventListener("keyup", function (event) {
+            if (event.key === "Enter") {
+                const code = this.value.trim();
+                if (code !== "") {
+                    fetch(`/Inventario/GetMaterialByKanban?kanban=${code}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                const material = data.material;
+                                const kanbanKey = material.kanban.trim().toUpperCase();
 
-            fetch(`/Inventario/BuscarEmpleado?numeroDeEmpleado=${num}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById("empleadoFoto").src = "/images/user.png"; // Aquí puedes enlazar foto real si la tienes
-                        document.getElementById("empleadoNombre").textContent = data.nombre;
-                        document.getElementById("empleadoNumero").textContent = data.numero;
-                        document.getElementById("empleadoPuesto").textContent = data.categoria;
-
-                        document.getElementById("empleadoInfo").classList.remove("hidden");
-                        document.getElementById("materialSection").classList.remove("hidden");
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => console.error("Error:", error));
-        });
-
-        // Simulación de captura de material
-        document.getElementById("btnEnviarMaterial").addEventListener("click", function () {
-            const m1 = document.getElementById("material1").value.trim();
-            const c1 = document.getElementById("cantidad1").value.trim();
-            const m2 = document.getElementById("material2").value.trim();
-            const c2 = document.getElementById("cantidad2").value.trim();
-            const m3 = document.getElementById("material3").value.trim();
-            const c3 = document.getElementById("cantidad3").value.trim();
-
-            if (m1 === "" || c1 === "" || m2 === "" || c2 === "" || m3 === "" || c3 === "") {
-                alert("Debes ingresar los 3 materiales y sus cantidades");
-                return;
+                                if (productos[kanbanKey]) {
+                                    productos[kanbanKey].count++;
+                                } else {
+                                    productos[kanbanKey] = {
+                                        description: material.description,
+                                        kanban: material.kanban,
+                                        partNumber: material.partNumber,
+                                        uom: material.uom,
+                                        stdPack: material.stdPack,
+                                        imageUrl: material.imageUrl,
+                                        count: 1
+                                    };
+                                }
+                                renderTabla();
+                            } else {
+                                alert(data.error || "Material no encontrado");
+                            }
+                        });
+                    this.value = "";
+                }
             }
-
-            document.getElementById("successMessage").classList.remove("hidden");
-
-            // Limpiar inputs
-            document.getElementById("material1").value = "";
-            document.getElementById("cantidad1").value = "";
-            document.getElementById("material2").value = "";
-            document.getElementById("cantidad2").value = "";
-            document.getElementById("material3").value = "";
-            document.getElementById("cantidad3").value = "";
-            document.getElementById("obsInput").value = "";
         });
     </script>
 }

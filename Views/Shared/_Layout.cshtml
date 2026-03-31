@@ -4,48 +4,52 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - SIQuim</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SIQuim.styles.css" asp-append-version="true" />
+
+    <!-- TailwindCSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fuente Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
-<body>
+<body class="flex min-h-screen flex-col bg-gray-50">
+
+    <!-- Navbar -->
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SIQuim</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+        <nav class="border-b border-gray-200 bg-white">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex h-16 justify-between">
+                    <!-- Logo -->
+                    <div class="flex flex-shrink-0 items-center">
+                        <a href="/" class="text-xl font-bold text-blue-600">SIQuim</a>
+                    </div>
+
+                    <!-- Links -->
+                    <div class="hidden sm:flex sm:space-x-8">
+                        <a href="/" class="flex items-center text-gray-700 hover:text-blue-600">Home</a>
+                        <a href="/Home/Privacy" class="flex items-center text-gray-700 hover:text-blue-600">Privacy</a>
+                        <a href="/Inventario/Materiales" class="flex items-center text-gray-700 hover:text-blue-600">Materiales</a>
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - SIQuim - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- Contenido principal -->
+    <main role="main" class="container mx-auto flex-grow px-4 py-6">
+        @RenderBody()
+    </main>
+
+    <!-- Footer fijo abajo -->
+    <footer class="border-t bg-white text-gray-500">
+        <div class="mx-auto max-w-7xl px-4 py-4">
+            &copy; 2026 - SIQuim - <a asp-area="" asp-controller="Home" asp-action="Privacy" class="hover:text-blue-600">Privacy</a>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

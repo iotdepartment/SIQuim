@@ -7,6 +7,8 @@ public partial class Materiale
 {
     public int Id { get; set; }
 
+    public string? ImageUrl { get; set; }
+
     public string Description { get; set; } = null!;
 
     public string? Kanban { get; set; }

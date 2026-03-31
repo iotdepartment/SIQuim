@@ -1,0 +1,94 @@
+﻿@{
+    ViewData["Title"] = "Materiales";
+}
+
+<h1 class="mb-6 text-center text-2xl font-bold">Listado de Materiales</h1>
+
+<div class="mb-5 overflow-x-auto">
+    <table id="materialesTable" class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Imagen</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Descripción</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Kanban</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Part Number</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Vendor</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">UOM</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">StdPack</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Costo</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Categoría</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white"></tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.7/css/dataTables.dataTables.css" />
+    <script src="https://cdn.datatables.net/2.3.7/js/dataTables.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#materialesTable').DataTable({
+                ajax: '/Inventario/GetMateriales',
+                responsive: true,
+                columns: [
+                         {
+            data: 'imageUrl',
+            render: function (data) {
+                // Imagen predeterminada si no hay valor
+                let defaultImage = "/images/materiales/default.png"; // coloca aquí tu ruta real
+                let imgSrc = data && data.trim() !== "" ? data : defaultImage;
+                return `<img src="${imgSrc}" alt="Imagen" class="h-12 w-12 rounded-lg border object-cover" />`;
+            }
+        },
+                    { data: 'description' },
+                    { data: 'kanban' },
+                    { data: 'partNumber' },
+                    { data: 'vendor' },
+                    {
+                        data: 'uom',
+                        render: function (data, type, row) {
+                            if (!data) return "";
+                            let colorClass = "bg-gray-200 text-gray-800";
+
+                            switch (data.toUpperCase()) {
+                                case "GA":
+                                    colorClass = "bg-blue-100 text-blue-800";
+                                    break;
+                                case "EA":
+                                    colorClass = "bg-green-100 text-green-800";
+                                    break;
+                                case "KG":
+                                    colorClass = "bg-yellow-100 text-yellow-800";
+                                    break;
+                                case "LT":
+                                    colorClass = "bg-purple-100 text-purple-800";
+                                    break;
+                            }
+
+                            return `<span class="${colorClass} rounded-full px-2 py-1 text-xs font-semibold">${data}</span>`;
+                        }
+                    },
+                    { data: 'stdPack' },
+                    { data: 'cost' },
+                    { data: 'category' }
+                ],
+                pageLength: 10,
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/2.3.7/i18n/es-MX.json"
+                },
+                createdRow: function (row, data, dataIndex) {
+                    $(row).addClass("hover:bg-gray-50");
+                }
+            });
+        });
+    </script>
+}

@@ -19,26 +19,77 @@ namespace SIQuim.Controllers
             return View();
         }
 
-        // Acción para buscar empleado por número
-        [HttpGet]
-        public IActionResult BuscarEmpleado(int numeroDeEmpleado)
-        {
-            var empleado = _context.Empleados
-                .FirstOrDefault(e => e.NumeroDeEmpleado == numeroDeEmpleado);
 
-            if (empleado == null)
+        [HttpGet]
+        public IActionResult BuscarEmpleado(string numeroDeEmpleado)
+        {
+            try
             {
-                return Json(new { success = false, message = "Empleado no encontrado" });
+                if (!int.TryParse(numeroDeEmpleado, out int num))
+                    return Json(new { success = false, error = "Número inválido" });
+
+                var empleado = _context.Empleados
+                    .FirstOrDefault(e => e.NumeroDeEmpleado == num);
+
+                if (empleado == null)
+                    return Json(new { success = false, error = "Empleado no encontrado" });
+
+                return Json(new
+                {
+                    success = true,
+                    numero = empleado.NumeroDeEmpleado,
+                    nombre = empleado.Nombre,
+                    area = empleado.Area,
+                    categoria = empleado.Categoria
+                });
             }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message });
+            }
+        }
+
+        // Vista principal
+        public IActionResult Materiales()
+        {
+            return View();
+        }
+
+        // Endpoint que devuelve los registros en JSON
+        [HttpGet]
+        public IActionResult GetMateriales()
+        {
+            var materiales = _context.Materiales.ToList();
+            return Json(new { data = materiales }); 
+        }
+
+
+        [HttpGet]
+        public IActionResult GetMaterialByKanban(string kanban)
+        {
+            if (string.IsNullOrWhiteSpace(kanban))
+                return Json(new { success = false, error = "Kanban inválido" });
+
+            var material = _context.Materiales
+                .FirstOrDefault(m => m.Kanban.Trim().ToUpper() == kanban.Trim().ToUpper());
+
+            if (material == null)
+                return Json(new { success = false, error = "Material no encontrado" });
 
             return Json(new
             {
                 success = true,
-                nombre = empleado.Nombre,
-                numero = empleado.NumeroDeEmpleado,
-                area = empleado.Area,
-                categoria = empleado.Categoria
+                material = new
+                {
+                    description = material.Description,
+                    kanban = material.Kanban.Trim().ToUpper(),
+                    partNumber = material.PartNumber,
+                    uom = material.Uom,
+                    stdPack = material.StdPack,
+                    imageUrl = material.ImageUrl // si tienes este campo en la tabla
+                }
             });
         }
+
     }
 }
