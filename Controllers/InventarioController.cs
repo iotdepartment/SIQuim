@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SIQuim.Models;
 using Microsoft.EntityFrameworkCore;
+using SIQuim.DTOs;
+using SIQuim.Models;
 
 namespace SIQuim.Controllers
 {
@@ -81,14 +82,53 @@ namespace SIQuim.Controllers
                 success = true,
                 material = new
                 {
+                    id = material.Id,
                     description = material.Description,
                     kanban = material.Kanban.Trim().ToUpper(),
                     partNumber = material.PartNumber,
                     uom = material.Uom,
                     stdPack = material.StdPack,
-                    imageUrl = material.ImageUrl // si tienes este campo en la tabla
+                    imageUrl = material.ImageUrl
                 }
             });
+        }
+        [HttpPost]
+        public IActionResult RegistrarPedido([FromBody] RegistrarPedidoDto dto)
+        {
+            var entrega = _context.Empleados.FirstOrDefault(e => e.NumeroDeEmpleado == dto.ResponsableEntrega);
+            var recibe = _context.Empleados.FirstOrDefault(e => e.NumeroDeEmpleado == dto.ResponsableReciba);
+
+            if (entrega == null || recibe == null)
+                return Json(new { success = false, error = "Empleado no encontrado" });
+
+            var pedido = new Pedido
+            {
+                FechaHora = DateTime.Now,
+                ResponsableEntregaId = entrega.Id,
+                ResponsableRecibeId = recibe.Id
+            };
+
+            _context.Pedidos.Add(pedido);
+            _context.SaveChanges();
+
+            foreach (var item in dto.Materiales)
+            {
+                var registro = new Registro
+                {
+                    FechaHora = DateTime.Now,
+                    ResponsableEntrega = entrega.Id,
+                    ResponsableReciba = recibe.Id,
+                    MaterialId = item.MaterialId,
+                    Qty = item.Qty,
+                    PedidoId = pedido.Id
+                };
+
+                _context.Registros.Add(registro);
+            }
+
+            _context.SaveChanges();
+
+            return Json(new { success = true, pedidoId = pedido.Id });
         }
 
     }

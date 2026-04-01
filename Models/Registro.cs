@@ -17,6 +17,9 @@ public partial class Registro
 
     public int Qty { get; set; }
 
+    public int PedidoId { get; set; }
+    public Pedido Pedido { get; set; }
+
     public virtual Materiale Material { get; set; } = null!;
 
     public virtual Empleado ResponsableEntregaNavigation { get; set; } = null!;

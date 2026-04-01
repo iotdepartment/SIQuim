@@ -19,6 +19,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Materiale> Materiales { get; set; }
 
+    public DbSet<Pedido> Pedidos { get; set; }
+
     public virtual DbSet<Registro> Registros { get; set; }
 
     public virtual DbSet<Stock> Stocks { get; set; }
@@ -33,6 +35,7 @@ public partial class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // Empleado
         modelBuilder.Entity<Empleado>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Empleado__3214EC27180AE6A1");
@@ -43,6 +46,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Nombre).HasMaxLength(200);
         });
 
+        // Materiales
         modelBuilder.Entity<Materiale>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Material__3214EC276457C408");
@@ -58,6 +62,33 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Vendor).HasMaxLength(150);
         });
 
+        // Pedido
+        modelBuilder.Entity<Pedido>(entity =>
+        {
+            entity.HasKey(p => p.Id).HasName("PK__Pedido__3214EC27");
+
+            entity.ToTable("Pedido");
+
+            entity.Property(p => p.Id).HasColumnName("ID");
+            entity.Property(p => p.FechaHora)
+                  .HasDefaultValueSql("(getdate())")
+                  .HasColumnType("datetime");
+
+            // Relación con empleados
+            entity.HasOne(p => p.ResponsableEntrega)
+                  .WithMany()
+                  .HasForeignKey(p => p.ResponsableEntregaId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_Pedido_Entrega");
+
+            entity.HasOne(p => p.ResponsableRecibe)
+                  .WithMany()
+                  .HasForeignKey(p => p.ResponsableRecibeId)
+                  .OnDelete(DeleteBehavior.Restrict)
+                  .HasConstraintName("FK_Pedido_Recibe");
+        });
+
+        // Registro
         modelBuilder.Entity<Registro>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Registro__3214EC27595AEC86");
@@ -70,22 +101,33 @@ public partial class AppDbContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.MaterialId).HasColumnName("MaterialID");
 
+            // Relación con Material
             entity.HasOne(d => d.Material).WithMany(p => p.Registros)
                 .HasForeignKey(d => d.MaterialId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Registro_Material");
 
+            // Relación con Empleado (Entrega)
             entity.HasOne(d => d.ResponsableEntregaNavigation).WithMany(p => p.RegistroResponsableEntregaNavigations)
                 .HasForeignKey(d => d.ResponsableEntrega)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Registro_Entrega");
 
+            // Relación con Empleado (Reciba)
             entity.HasOne(d => d.ResponsableRecibaNavigation).WithMany(p => p.RegistroResponsableRecibaNavigations)
                 .HasForeignKey(d => d.ResponsableReciba)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Registro_Reciba");
+
+            // Relación con Pedido
+            entity.HasOne(d => d.Pedido)
+                .WithMany(p => p.Registros)
+                .HasForeignKey(d => d.PedidoId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_Registro_Pedido");
         });
 
+        // Stock
         modelBuilder.Entity<Stock>(entity =>
         {
             entity.HasKey(e => e.StockId).HasName("PK__Stock__2C83A9E27F5DE0E3");
@@ -110,6 +152,7 @@ public partial class AppDbContext : DbContext
                 .HasConstraintName("FK_Stock_Ubicaciones");
         });
 
+        // ToolCrib
         modelBuilder.Entity<ToolCrib>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__ToolCrib__3214EC2700DCEC7B");
@@ -121,6 +164,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Hora).HasDefaultValueSql("(CONVERT([time],getdate()))");
         });
 
+        // Ubicaciones
         modelBuilder.Entity<Ubicacione>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Ubicacio__10375DF57DE70632");

@@ -33,7 +33,7 @@
 
     <!-- Input para Kanban -->
     <div id="kanbanSection" class="mb-6 hidden">
-        <label for="kanbanScan" class="mb-2 block font-semibold text-gray-700">Escanea Kanban</label>
+        <label for="kanbanScan" class="mb-2 block font-semibold text-gray-700">Escanea Kanban. Cuando termines de escanear escanea el codigo FIN.</label>
         <input id="kanbanScan" type="text"
                class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500"
                placeholder="Escanea código Kanban" />
@@ -56,26 +56,54 @@
             <tbody id="productosBody"></tbody>
         </table>
     </div>
+
+    <!-- Modal receptor -->
+    <div id="modalReceptor"
+         class="fixed inset-0 flex hidden items-center justify-center bg-gray-900 bg-opacity-50">
+        <div id="modalContent"
+             class="w-96 scale-75 transform rounded-lg bg-white p-6 opacity-0 shadow-lg transition-opacity transition-transform duration-300 ease-out">
+            <h2 class="mb-4 text-lg font-bold">Escanea empleado receptor</h2>
+            <input id="empleadoReceptorInput" type="text"
+                   class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                   placeholder="Escanea número de empleado receptor" autofocus />
+        </div>
+    </div>
+
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
+        let flujoEstado = "inicio";
+        let empleadoDespacha = null;
+        let empleadoRecibe = null;
         let productos = {};
 
-        // Badge de UOM
-        function renderUOMBadge(uom) {
-            if (!uom) return "";
-            let colorClass = "bg-gray-200 text-gray-800";
-            switch (uom.toUpperCase()) {
-                case "GA": colorClass = "bg-blue-100 text-blue-800"; break;
-                case "EA": colorClass = "bg-green-100 text-green-800"; break;
-                case "KG": colorClass = "bg-yellow-100 text-yellow-800"; break;
-                case "LT": colorClass = "bg-purple-100 text-purple-800"; break;
-            }
-            return `<span class="${colorClass} rounded-full px-2 py-1 text-xs font-semibold">${uom}</span>`;
+        // Animación zoom in para modal receptor
+        function mostrarModalReceptor() {
+            const modal = document.getElementById("modalReceptor");
+            const content = document.getElementById("modalContent");
+
+            modal.classList.remove("hidden");
+            void content.offsetWidth; // reflow
+
+            content.classList.remove("scale-75", "opacity-0");
+            content.classList.add("scale-100", "opacity-100");
         }
 
-        // Renderizar tabla
+        function ocultarModalReceptor() {
+            const modal = document.getElementById("modalReceptor");
+            const content = document.getElementById("modalContent");
+
+            content.classList.remove("scale-100", "opacity-100");
+            content.classList.add("scale-75", "opacity-0");
+
+            setTimeout(() => {
+                modal.classList.add("hidden");
+            }, 300);
+        }
+
         function renderTabla() {
             const body = document.getElementById("productosBody");
             body.innerHTML = "";
@@ -88,13 +116,13 @@
                         <td class="border px-4 py-2">${p.description}</td>
                         <td class="border px-4 py-2">${p.kanban}</td>
                         <td class="border px-4 py-2">${p.partNumber}</td>
-                        <td class="border px-4 py-2">${renderUOMBadge(p.uom)}</td>
+                        <td class="border px-4 py-2">${p.uom}</td>
                         <td class="border px-4 py-2">${p.stdPack}</td>
                     </tr>`;
             });
         }
 
-        // Escaneo de empleado
+        // Escaneo de empleado inicial
         document.getElementById("empleadoScan").addEventListener("keyup", function (event) {
             if (event.key === "Enter") {
                 const code = this.value.trim();
@@ -103,57 +131,138 @@
                         .then(r => r.json())
                         .then(data => {
                             if (data.success) {
-                                document.getElementById("empleadoNombre").textContent = data.nombre;
-                                document.getElementById("empleadoNumero").textContent = data.numero;
-                                document.getElementById("empleadoArea").textContent = data.area;
-                                document.getElementById("empleadoCategoria").textContent = data.categoria;
-
-                                document.getElementById("empleadoInfo").classList.remove("hidden");
+                                empleadoDespacha = data.numero;
+                                flujoEstado = "escaneoKanban";
                                 document.getElementById("kanbanSection").classList.remove("hidden");
                                 document.getElementById("productosSection").classList.remove("hidden");
-
                                 document.getElementById("kanbanScan").focus();
                             } else {
-                                alert(data.error || "Empleado no encontrado");
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Empleado no encontrado',
+                                    text: 'Verifica el número escaneado'
+                                });
                             }
                         });
                 }
             }
         });
 
-        // Escaneo de Kanban
+        // Escaneo de Kanban o código de cierre
         document.getElementById("kanbanScan").addEventListener("keyup", function (event) {
             if (event.key === "Enter") {
-                const code = this.value.trim();
+                const code = this.value.trim().toUpperCase();
                 if (code !== "") {
-                    fetch(`/Inventario/GetMaterialByKanban?kanban=${code}`)
-                        .then(r => r.json())
-                        .then(data => {
-                            if (data.success) {
-                                const material = data.material;
-                                const kanbanKey = material.kanban.trim().toUpperCase();
-
-                                if (productos[kanbanKey]) {
-                                    productos[kanbanKey].count++;
+                    if (code === "FIN") {
+                        mostrarModalReceptor();
+                        document.getElementById("empleadoReceptorInput").focus();
+                    } else {
+                        fetch(`/Inventario/GetMaterialByKanban?kanban=${code}`)
+                            .then(r => r.json())
+                            .then(data => {
+                                if (data.success) {
+                                    const material = data.material;
+                                    const kanbanKey = material.kanban.trim().toUpperCase();
+                                    if (productos[kanbanKey]) {
+                                        productos[kanbanKey].count++;
+                                    } else {
+                                        productos[kanbanKey] = { ...material, count: 1 };
+                                    }
+                                    renderTabla();
                                 } else {
-                                    productos[kanbanKey] = {
-                                        description: material.description,
-                                        kanban: material.kanban,
-                                        partNumber: material.partNumber,
-                                        uom: material.uom,
-                                        stdPack: material.stdPack,
-                                        imageUrl: material.imageUrl,
-                                        count: 1
-                                    };
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Material no encontrado',
+                                        text: 'Verifica el código escaneado'
+                                    });
                                 }
-                                renderTabla();
-                            } else {
-                                alert(data.error || "Material no encontrado");
-                            }
-                        });
+                            });
+                    }
                     this.value = "";
                 }
             }
         });
+
+        // Escaneo de empleado receptor en modal
+        document.getElementById("empleadoReceptorInput").addEventListener("keyup", function (event) {
+            if (event.key === "Enter") {
+                const receptorCode = this.value.trim();
+                if (receptorCode !== "") {
+                    fetch(`/Inventario/BuscarEmpleado?numeroDeEmpleado=${receptorCode}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                empleadoRecibe = data.numero;
+                                flujoEstado = "cierre";
+                                ocultarModalReceptor();
+
+                                // Construir DTO del pedido
+                                const materiales = Object.values(productos).map(p => ({
+                                    materialId: p.id,
+                                    qty: p.count
+                                }));
+
+                                const pedidoDto = {
+                                    responsableEntrega: empleadoDespacha,
+                                    responsableReciba: empleadoRecibe,
+                                    materiales: materiales
+                                };
+
+                                // Enviar pedido completo al backend
+                                fetch("/Inventario/RegistrarPedido", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify(pedidoDto)
+                                })
+                                .then(r => r.json())
+                                .then(result => {
+                                    if (result.success) {
+                                        localStorage.setItem("registroSuccess", "true");
+                                        location.reload();
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error al registrar',
+                                            text: result.error || 'No se pudo registrar el pedido'
+                                        });
+                                    }
+                                })
+                                .catch(err => {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error de conexión',
+                                        text: err.message
+                                    });
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Empleado receptor no encontrado',
+                                    text: 'Verifica el número escaneado'
+                                });
+                            }
+                        });
+                }
+            }
+        });
+
+        // Mostrar toast después de recargar si hubo éxito
+        window.addEventListener("load", function () {
+            if (localStorage.getItem("registroSuccess") === "true") {
+                localStorage.removeItem("registroSuccess");
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Pedido registrado correctamente',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: '#4CAF50',
+                    color: '#fff'
+                });
+            }
+        });
     </script>
+
 }
