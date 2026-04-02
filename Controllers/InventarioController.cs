@@ -49,7 +49,6 @@ namespace SIQuim.Controllers
                 return Json(new { success = false, error = ex.Message });
             }
         }
-
         // Vista principal
         public IActionResult Materiales()
         {
@@ -129,6 +128,38 @@ namespace SIQuim.Controllers
             _context.SaveChanges();
 
             return Json(new { success = true, pedidoId = pedido.Id });
+        }
+
+        // Vista Razor
+        public IActionResult Pedidos()
+        {
+            return View();
+        }
+
+        // Endpoint JSON para DataTables
+        [HttpGet]
+        public async Task<IActionResult> GetPedidos()
+        {
+            var pedidos = await _context.Pedidos
+                .Include(p => p.ResponsableEntrega)
+                .Include(p => p.ResponsableRecibe)
+                .Include(p => p.Registros)
+                    .ThenInclude(r => r.Material)
+                .OrderByDescending(p => p.FechaHora)
+                .ToListAsync();
+
+            var result = pedidos.Select(p => new
+            {
+                id = p.Id,
+                fechaHora = p.FechaHora.ToString("dd/MM/yyyy HH:mm"),
+                entrega = p.ResponsableEntrega?.Nombre,
+                recibe = p.ResponsableRecibe?.Nombre,
+                materiales = p.Registros.Select(r =>
+                    $"{r.Material.Description} (Kanban: {r.Material.Kanban}, Qty: {r.Qty})"
+                ).ToList()
+            });
+
+            return Json(new { data = result });
         }
 
     }

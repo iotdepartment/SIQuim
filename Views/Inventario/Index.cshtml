@@ -1,266 +1,309 @@
 ﻿@{
     ViewData["Title"] = "Control de Inventarios";
 }
+<!-- Contenedor principal -->
+<div class="container mt-4">
 
-<script src="https://cdn.tailwindcss.com"></script>
+    <!-- Grid de dos columnas -->
+    <div class="row">
+        <!-- Sección escaneo de empleado -->
+        <div class="col-md-6 mb-4">
+            <!-- Card título -->
+            <div class="card rounded-pill mb-3 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h2 class="h5 fw-bold mb-0">👷 Escaneo de empleado</h2>
+                </div>
+            </div>
+            <!-- Card contenido -->
+            <div class="card rounded-4 border-0 shadow-sm">
+                <div class="card-body">
+                    <label for="empleadoScan" class="form-label">Número de empleado</label>
+                    <input id="empleadoScan" type="text" class="form-control w-75"
+                           placeholder="Escanea tu número de empleado" autofocus />
+                </div>
+            </div>
+        </div>
 
-<div class="container mx-auto mt-10 max-w-6xl rounded-lg bg-white p-6 shadow-lg">
-    <h1 class="mb-6 text-2xl font-bold text-gray-800">Sistema de Control de Inventarios</h1>
-
-    <!-- Input para número de empleado -->
-    <div class="mb-6">
-        <label for="empleadoScan" class="mb-2 block font-semibold text-gray-700">Número de empleado</label>
-        <input id="empleadoScan" type="text"
-               class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500"
-               placeholder="Escanea tu número de empleado" autofocus />
-    </div>
-
-    <!-- Info empleado -->
-    <div id="empleadoInfo" class="mb-6 hidden rounded-lg border bg-gray-50 p-4">
-        <div class="flex items-center gap-4">
-            <img id="empleadoFoto" src="/images/user.png" alt="Foto TM"
-                 class="h-20 w-20 rounded-full border object-cover" />
-            <div>
-                <p class="text-lg font-semibold text-gray-800">
-                    <span id="empleadoNombre"></span>
-                </p>
-                <p class="text-gray-600">Empleado: <span id="empleadoNumero"></span></p>
-                <p class="text-gray-600">Área: <span id="empleadoArea"></span></p>
-                <p class="text-gray-600">Categoría: <span id="empleadoCategoria"></span></p>
+        <!-- Sección información del empleado -->
+        <div class="col-md-6 mb-4">
+            <!-- Card título -->
+            <div id="empleadotitle" class="card rounded-pill d-none mb-3 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <h2 class="h5 fw-bold mb-0">📋 Información del empleado</h2>
+                </div>
+            </div>
+            <!-- Card contenido -->
+            <div id="empleadoInfo" class="card rounded-4 d-none border-0 shadow-sm">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <img id="empleadoFoto" src="/images/user.png" alt="Foto TM"
+                         class="rounded-circle border" style="width:80px;height:80px;object-fit:cover;" />
+                    <div>
+                        <p class="fw-bold mb-1" id="empleadoNombre">Nombre del empleado</p>
+                        <p class="mb-0">Número: <span id="empleadoNumero"></span></p>
+                        <p class="mb-0">Área: <span id="empleadoArea"></span></p>
+                        <p class="mb-0">Categoría: <span id="empleadoCategoria"></span></p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Input para Kanban -->
-    <div id="kanbanSection" class="mb-6 hidden">
-        <label for="kanbanScan" class="mb-2 block font-semibold text-gray-700">Escanea Kanban. Cuando termines de escanear escanea el codigo FIN.</label>
-        <input id="kanbanScan" type="text"
-               class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500"
-               placeholder="Escanea código Kanban" />
-    </div>
+    <!-- Card: Kanban y materiales -->
+    <div id="kanbanSection" class="card d-none rounded-4 mt-4 border-0 shadow-sm">
+        <div class="card-body">
+            <h2 class="h5 fw-bold mb-3">📦 Materiales escaneados</h2>
+            <p class="text-muted">Escanea Kanban. Cuando termines, escanea el código <strong>FIN</strong>.</p>
+            <input id="kanbanScan" type="text" class="form-control w-25 mb-3"
+                   placeholder="Escanea código Kanban" />
 
-    <!-- Tabla de productos escaneados -->
-    <div id="productosSection" class="hidden">
-        <table class="min-w-full border border-gray-300 text-left text-sm">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th class="border px-4 py-2">Cantidad</th>
-                    <th class="border px-4 py-2">Imagen</th>
-                    <th class="border px-4 py-2">Descripción</th>
-                    <th class="border px-4 py-2">Kanban</th>
-                    <th class="border px-4 py-2">Part Number</th>
-                    <th class="border px-4 py-2">UOM</th>
-                    <th class="border px-4 py-2">StdPack</th>
-                </tr>
-            </thead>
-            <tbody id="productosBody"></tbody>
-        </table>
-    </div>
-
-    <!-- Modal receptor -->
-    <div id="modalReceptor"
-         class="fixed inset-0 flex hidden items-center justify-center bg-gray-900 bg-opacity-50">
-        <div id="modalContent"
-             class="w-96 scale-75 transform rounded-lg bg-white p-6 opacity-0 shadow-lg transition-opacity transition-transform duration-300 ease-out">
-            <h2 class="mb-4 text-lg font-bold">Escanea empleado receptor</h2>
-            <input id="empleadoReceptorInput" type="text"
-                   class="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                   placeholder="Escanea número de empleado receptor" autofocus />
+            <!-- Tabla productos -->
+            <div id="productosSection" class="d-none">
+                <table class="table-bordered table-striped rounded-4 table">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Cantidad</th>
+                            <th>Imagen</th>
+                            <th>Descripción</th>
+                            <th>Kanban</th>
+                            <th>Part Number</th>
+                            <th>UOM</th>
+                            <th>StdPack</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productosBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
-
 </div>
 
+<!-- Modal receptor -->
+<div class="modal fade" id="modalReceptor" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="modalContent">
+            <div class="modal-header">
+                <h5 class="modal-title">Escanea No. de Empleado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Input receptor -->
+                <input id="empleadoReceptorInput" type="text" class="form-control mb-3"
+                       placeholder="No. de Empleado" />
+
+                <!-- Info receptor -->
+                <div id="empleadoReceptorInfo" class="card d-none mb-3">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <img src="/images/user.png" alt="Foto receptor"
+                             class="rounded-circle border" style="width:64px;height:64px;object-fit:cover;" />
+                        <div>
+                            <p class="fw-bold mb-1" id="receptorNombre"></p>
+                            <p class="mb-0">Número: <span id="receptorNumero"></span></p>
+                            <p class="mb-0">Área: <span id="receptorArea"></span></p>
+                            <p class="mb-0">Categoría: <span id="receptorCategoria"></span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input confirmación -->
+                <input id="confirmacionInput" type="text" class="form-control d-none"
+                       placeholder="Escribe OK para confirmar o CANCELAR para reintentar" />
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        // Estado del flujo
         let flujoEstado = "inicio";
         let empleadoDespacha = null;
         let empleadoRecibe = null;
         let productos = {};
 
-        // Animación zoom in para modal receptor
-        function mostrarModalReceptor() {
-            const modal = document.getElementById("modalReceptor");
-            const content = document.getElementById("modalContent");
+        // Instancia modal Bootstrap
+        const modalReceptor = new bootstrap.Modal(document.getElementById("modalReceptor"));
 
-            modal.classList.remove("hidden");
-            void content.offsetWidth; // reflow
+        // Cuando el modal se muestra, hacer focus en el input
+        document.getElementById("modalReceptor").addEventListener("shown.bs.modal", () => {
+            document.getElementById("empleadoReceptorInput").focus();
+        });
 
-            content.classList.remove("scale-75", "opacity-0");
-            content.classList.add("scale-100", "opacity-100");
-        }
-
-        function ocultarModalReceptor() {
-            const modal = document.getElementById("modalReceptor");
-            const content = document.getElementById("modalContent");
-
-            content.classList.remove("scale-100", "opacity-100");
-            content.classList.add("scale-75", "opacity-0");
-
-            setTimeout(() => {
-                modal.classList.add("hidden");
-            }, 300);
-        }
-
-        function renderTabla() {
-            const body = document.getElementById("productosBody");
-            body.innerHTML = "";
-            Object.values(productos).forEach(p => {
-                const imgPath = p.imageUrl ? `/images/materiales/${p.imageUrl}` : `/images/materiales/default.png`;
-                body.innerHTML += `
-                    <tr>
-                        <td class="border px-4 py-2">x${p.count}</td>
-                        <td class="border px-4 py-2"><img src="${imgPath}" class="h-12 w-12 rounded border object-cover" /></td>
-                        <td class="border px-4 py-2">${p.description}</td>
-                        <td class="border px-4 py-2">${p.kanban}</td>
-                        <td class="border px-4 py-2">${p.partNumber}</td>
-                        <td class="border px-4 py-2">${p.uom}</td>
-                        <td class="border px-4 py-2">${p.stdPack}</td>
-                    </tr>`;
+        // Función genérica para mostrar alertas
+        function mostrarAlerta(tipo, titulo, texto) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: tipo,              // "success", "error", "warning", "info"
+                title: titulo,
+                text: texto,
+                showConfirmButton: false,
+                timer: 3000,             // Se cierra solo en 3 segundos
+                timerProgressBar: true,
+                background: tipo === 'success' ? '#4CAF50' : '#f44336',
+                color: '#fff'
             });
         }
 
+        // Renderizar tabla de productos
+        function renderTabla() {
+            const body = document.getElementById("productosBody");
+            body.innerHTML = Object.values(productos).map(p => {
+                const imgPath = p.imageUrl ? `/images/materiales/${p.imageUrl}` : `/images/materiales/default.png`;
+                return `
+                    <tr>
+                        <td>x${p.count}</td>
+                        <td><img src="${imgPath}" class="img-thumbnail" style="width:48px;height:48px;object-fit:cover;" /></td>
+                        <td>${p.description}</td>
+                        <td>${p.kanban}</td>
+                        <td>${p.partNumber}</td>
+                        <td>${p.uom}</td>
+                        <td>${p.stdPack}</td>
+                    </tr>`;
+            }).join("");
+        }
+
+        // Buscar empleado
+        async function buscarEmpleado(numero) {
+            const r = await fetch(`/Inventario/BuscarEmpleado?numeroDeEmpleado=${numero}`);
+            return r.json();
+        }
+
+        // Buscar material
+        async function buscarMaterial(kanban) {
+            const r = await fetch(`/Inventario/GetMaterialByKanban?kanban=${kanban}`);
+            return r.json();
+        }
+
+        // Registrar pedido
+        async function registrarPedido() {
+            const materiales = Object.values(productos).map(p => ({ materialId: p.id, qty: p.count }));
+            const pedidoDto = { responsableEntrega: empleadoDespacha, responsableReciba: empleadoRecibe, materiales };
+
+            const r = await fetch("/Inventario/RegistrarPedido", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(pedidoDto)
+            });
+            return r.json();
+        }
+
         // Escaneo de empleado inicial
-        document.getElementById("empleadoScan").addEventListener("keyup", function (event) {
-            if (event.key === "Enter") {
-                const code = this.value.trim();
-                if (code !== "") {
-                    fetch(`/Inventario/BuscarEmpleado?numeroDeEmpleado=${code}`)
-                        .then(r => r.json())
-                        .then(data => {
-                            if (data.success) {
-                                empleadoDespacha = data.numero;
-                                flujoEstado = "escaneoKanban";
-                                document.getElementById("kanbanSection").classList.remove("hidden");
-                                document.getElementById("productosSection").classList.remove("hidden");
-                                document.getElementById("kanbanScan").focus();
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Empleado no encontrado',
-                                    text: 'Verifica el número escaneado'
-                                });
-                            }
-                        });
+        document.getElementById("empleadoScan").addEventListener("keyup", async e => {
+            if (e.key === "Enter") {
+                const code = e.target.value.trim();
+                if (!code) return;
+
+                const data = await buscarEmpleado(code);
+                if (data.success) {
+                    empleadoDespacha = data.numero;
+                    flujoEstado = "escaneoKanban";
+
+                    document.getElementById("empleadoNombre").textContent = data.nombre;
+                    document.getElementById("empleadoNumero").textContent = data.numero;
+                    document.getElementById("empleadoArea").textContent = data.area;
+                    document.getElementById("empleadoCategoria").textContent = data.categoria;
+                    document.getElementById("empleadoInfo").classList.remove("d-none");
+                    document.getElementById("empleadotitle").classList.remove("d-none");
+
+                    document.getElementById("kanbanSection").classList.remove("d-none");
+                    document.getElementById("productosSection").classList.remove("d-none");
+                    document.getElementById("kanbanScan").focus();
+                } else {
+                    mostrarAlerta("error", "Empleado no encontrado", data.error || "Verifica el número escaneado");
                 }
+
+                e.target.value = "";
             }
         });
 
-        // Escaneo de Kanban o código de cierre
-        document.getElementById("kanbanScan").addEventListener("keyup", function (event) {
-            if (event.key === "Enter") {
-                const code = this.value.trim().toUpperCase();
-                if (code !== "") {
-                    if (code === "FIN") {
-                        mostrarModalReceptor();
+        // Escaneo de Kanban o cierre
+        document.getElementById("kanbanScan").addEventListener("keyup", async e => {
+            if (e.key === "Enter") {
+                const code = e.target.value.trim().toUpperCase();
+                if (!code) return;
+
+                if (code === "FIN") {
+                    if (Object.keys(productos).length > 0) {
+                        modalReceptor.show();
                         document.getElementById("empleadoReceptorInput").focus();
                     } else {
-                        fetch(`/Inventario/GetMaterialByKanban?kanban=${code}`)
-                            .then(r => r.json())
-                            .then(data => {
-                                if (data.success) {
-                                    const material = data.material;
-                                    const kanbanKey = material.kanban.trim().toUpperCase();
-                                    if (productos[kanbanKey]) {
-                                        productos[kanbanKey].count++;
-                                    } else {
-                                        productos[kanbanKey] = { ...material, count: 1 };
-                                    }
-                                    renderTabla();
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Material no encontrado',
-                                        text: 'Verifica el código escaneado'
-                                    });
-                                }
-                            });
+                        mostrarAlerta("error", "Acción inválida", "Debes registrar al menos un material antes de finalizar.");
                     }
-                    this.value = "";
+                } else {
+                    const data = await buscarMaterial(code);
+                    if (data.success) {
+                        const material = data.material;
+                        const key = material.kanban.trim().toUpperCase();
+                        productos[key] ? productos[key].count++ : productos[key] = { ...material, count: 1 };
+                        renderTabla();
+                    } else {
+                        mostrarAlerta("error", "Material no encontrado", "Verifica el código escaneado");
+                    }
                 }
+
+                e.target.value = "";
             }
         });
 
-        // Escaneo de empleado receptor en modal
-        document.getElementById("empleadoReceptorInput").addEventListener("keyup", function (event) {
-            if (event.key === "Enter") {
-                const receptorCode = this.value.trim();
-                if (receptorCode !== "") {
-                    fetch(`/Inventario/BuscarEmpleado?numeroDeEmpleado=${receptorCode}`)
-                        .then(r => r.json())
-                        .then(data => {
-                            if (data.success) {
-                                empleadoRecibe = data.numero;
-                                flujoEstado = "cierre";
-                                ocultarModalReceptor();
+        // Escaneo de empleado receptor
+        document.getElementById("empleadoReceptorInput").addEventListener("keyup", async e => {
+            if (e.key !== "Enter") return;
+            const code = e.target.value.trim();
+            if (!code) return;
 
-                                // Construir DTO del pedido
-                                const materiales = Object.values(productos).map(p => ({
-                                    materialId: p.id,
-                                    qty: p.count
-                                }));
+            const data = await buscarEmpleado(code);
+            if (data.success) {
+                empleadoRecibe = data.numero;
+                flujoEstado = "confirmacion";
 
-                                const pedidoDto = {
-                                    responsableEntrega: empleadoDespacha,
-                                    responsableReciba: empleadoRecibe,
-                                    materiales: materiales
-                                };
+                document.getElementById("receptorNombre").textContent = data.nombre;
+                document.getElementById("receptorNumero").textContent = data.numero;
+                document.getElementById("receptorArea").textContent = data.area;
+                document.getElementById("receptorCategoria").textContent = data.categoria;
+                document.getElementById("empleadoReceptorInfo").classList.remove("d-none");
 
-                                // Enviar pedido completo al backend
-                                fetch("/Inventario/RegistrarPedido", {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify(pedidoDto)
-                                })
-                                .then(r => r.json())
-                                .then(result => {
-                                    if (result.success) {
-                                        localStorage.setItem("registroSuccess", "true");
-                                        location.reload();
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'Error al registrar',
-                                            text: result.error || 'No se pudo registrar el pedido'
-                                        });
-                                    }
-                                })
-                                .catch(err => {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error de conexión',
-                                        text: err.message
-                                    });
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Empleado receptor no encontrado',
-                                    text: 'Verifica el número escaneado'
-                                });
-                            }
-                        });
+                document.getElementById("confirmacionInput").classList.remove("d-none");
+                document.getElementById("confirmacionInput").focus();
+            } else {
+                mostrarAlerta("error", "Empleado no encontrado", data.error || "Verifica el número escaneado");
+
+                document.getElementById("empleadoReceptorInfo").classList.add("d-none");
+                document.getElementById("confirmacionInput").classList.add("d-none");
+                document.getElementById("empleadoReceptorInput").focus();
+            }
+
+            e.target.value = "";
+        });
+
+        // Confirmación OK / CANCELAR
+        document.getElementById("confirmacionInput").addEventListener("keyup", async e => {
+            if (e.key !== "Enter") return;
+            const decision = e.target.value.trim().toUpperCase();
+            e.target.value = "";
+
+            if (decision === "OK") {
+                const result = await registrarPedido();
+                if (result.success) {
+                    localStorage.setItem("registroSuccess", "true");
+                    location.reload();
+                } else {
+                    mostrarAlerta("error", "Error al registrar", result.error);
                 }
+                modalReceptor.hide();
+            } else if (decision === "CANCELAR") {
+                document.getElementById("empleadoReceptorInfo").classList.add("d-none");
+                document.getElementById("confirmacionInput").classList.add("d-none");
+                document.getElementById("empleadoReceptorInput").focus();
+            } else {
+                mostrarAlerta("error", "Entrada inválida", "Escribe OK para confirmar o CANCELAR para reintentar");
             }
         });
 
-        // Mostrar toast después de recargar si hubo éxito
-        window.addEventListener("load", function () {
+        // Toast de éxito al cargar
+        window.addEventListener("load", () => {
             if (localStorage.getItem("registroSuccess") === "true") {
                 localStorage.removeItem("registroSuccess");
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Pedido registrado correctamente',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                    background: '#4CAF50',
-                    color: '#fff'
-                });
+                mostrarAlerta("success", "Pedido registrado correctamente", "");
             }
         });
     </script>

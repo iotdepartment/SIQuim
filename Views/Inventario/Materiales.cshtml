@@ -1,38 +1,49 @@
 ﻿@{
-    ViewData["Title"] = "Materiales";
+    ViewData["Title"] = "Listado de Materiales";
 }
 
-<h1 class="mb-6 text-center text-2xl font-bold">Listado de Materiales</h1>
+<!-- Contenedor principal -->
+<div class="container mt-4">
 
-<div class="mb-5 overflow-x-auto">
-    <table id="materialesTable" class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-100">
-            <tr>
-                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Imagen</th>
-                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Descripción</th>
-                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Kanban</th>
-                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Part Number</th>
-                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Vendor</th>
-                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">UOM</th>
-                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">StdPack</th>
-                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Costo</th>
-                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Categoría</th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200 bg-white"></tbody>
-    </table>
+    <!-- Título -->
+    <div class="card rounded-pill w-25 mb-3 border-0 shadow-sm">
+        <div class="card-body text-center">
+            <h2 class="h5 fw-bold mb-0">📦 Listado de materiales</h2>
+        </div>
+    </div>
+    <!-- Card contenedor de la tabla -->
+    <div class="card rounded-4 border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="materialesTable" class="table-striped table-bordered table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Imagen</th>
+                            <th>Descripción</th>
+                            <th>Kanban</th>
+                            <th>Part Number</th>
+                            <th>Vendor</th>
+                            <th>UOM</th>
+                            <th>StdPack</th>
+                            <th>Costo</th>
+                            <th>Categoría</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 
     <!-- DataTables -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.7/css/dataTables.dataTables.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.7/css/dataTables.bootstrap5.css" />
     <script src="https://cdn.datatables.net/2.3.7/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.3.7/js/dataTables.bootstrap5.js"></script>
 
     <script>
         $(document).ready(function () {
@@ -40,41 +51,32 @@
                 ajax: '/Inventario/GetMateriales',
                 responsive: true,
                 columns: [
-                         {
-            data: 'imageUrl',
-            render: function (data) {
-                // Imagen predeterminada si no hay valor
-                let defaultImage = "/images/materiales/default.png"; // coloca aquí tu ruta real
-                let imgSrc = data && data.trim() !== "" ? data : defaultImage;
-                return `<img src="${imgSrc}" alt="Imagen" class="h-12 w-12 rounded-lg border object-cover" />`;
-            }
-        },
+                    {
+                        data: 'imageUrl',
+                        render: function (data) {
+                            let defaultImage = "/images/materiales/default.png";
+                            let imgSrc = data && data.trim() !== "" ? data : defaultImage;
+                            return `<img src="${imgSrc}" alt="Imagen" class="img-thumbnail" style="width:48px;height:48px;object-fit:cover;" />`;
+                        }
+                    },
                     { data: 'description' },
                     { data: 'kanban' },
                     { data: 'partNumber' },
                     { data: 'vendor' },
                     {
                         data: 'uom',
-                        render: function (data, type, row) {
+                        render: function (data) {
                             if (!data) return "";
-                            let colorClass = "bg-gray-200 text-gray-800";
+                            let badgeClass = "bg-secondary";
 
                             switch (data.toUpperCase()) {
-                                case "GA":
-                                    colorClass = "bg-blue-100 text-blue-800";
-                                    break;
-                                case "EA":
-                                    colorClass = "bg-green-100 text-green-800";
-                                    break;
-                                case "KG":
-                                    colorClass = "bg-yellow-100 text-yellow-800";
-                                    break;
-                                case "LT":
-                                    colorClass = "bg-purple-100 text-purple-800";
-                                    break;
+                                case "GA": badgeClass = "bg-primary"; break;
+                                case "EA": badgeClass = "bg-success"; break;
+                                case "KG": badgeClass = "bg-warning text-dark"; break;
+                                case "LT": badgeClass = "bg-purple"; break;
                             }
 
-                            return `<span class="${colorClass} rounded-full px-2 py-1 text-xs font-semibold">${data}</span>`;
+                            return `<span class="badge ${badgeClass}">${data}</span>`;
                         }
                     },
                     { data: 'stdPack' },
@@ -84,9 +86,6 @@
                 pageLength: 10,
                 language: {
                     url: "//cdn.datatables.net/plug-ins/2.3.7/i18n/es-MX.json"
-                },
-                createdRow: function (row, data, dataIndex) {
-                    $(row).addClass("hover:bg-gray-50");
                 }
             });
         });

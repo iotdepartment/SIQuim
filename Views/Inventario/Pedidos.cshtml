@@ -1,0 +1,66 @@
+﻿@{
+    ViewData["Title"] = "Pedidos Realizados";
+}
+
+<div class="container mt-4">
+    <!-- Título -->
+    <div class="card rounded-pill w-25 mb-3 border-0 shadow-sm">
+        <div class="card-body text-center">
+            <h2 class="h5 fw-bold mb-0">📦 Listado de Pedidos</h2>
+        </div>
+    </div>
+    <div class="card rounded-4 border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="pedidosTable" class="table-striped table-bordered table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>No. Pedido</th>
+                            <th>Fecha/Hora</th>
+                            <th>Responsable Entrega</th>
+                            <th>Responsable Recibe</th>
+                            <th>Materiales</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+    <!-- DataTables con Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.7/css/dataTables.bootstrap5.css" />
+    <script src="https://cdn.datatables.net/2.3.7/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.3.7/js/dataTables.bootstrap5.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#pedidosTable').DataTable({
+                ajax: '/Inventario/GetPedidos',
+                responsive: true,
+                columns: [
+                    { data: 'id' },
+                    { data: 'fechaHora' },
+                    { data: 'entrega' },
+                    { data: 'recibe' },
+                    {
+                        data: 'materiales',
+                        render: function (data) {
+                            if (!data || data.length === 0) return "";
+                            return "<ul class='mb-0'>" + data.map(m => `<li>${m}</li>`).join("") + "</ul>";
+                        }
+                    }
+                ],
+                pageLength: 10,
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/2.3.7/i18n/es-MX.json"
+                }
+            });
+        });
+    </script>
+}
