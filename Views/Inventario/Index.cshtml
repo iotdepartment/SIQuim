@@ -1,8 +1,8 @@
 ﻿@{
-    ViewData["Title"] = "Control de Inventarios";
+    ViewData["Title"] = "Inicio";
 }
 <!-- Contenedor principal -->
-<div class="container mt-4">
+<div class="container mt-5">
 
     <!-- Grid de dos columnas -->
     <div class="row">
@@ -17,7 +17,7 @@
             <!-- Card contenido -->
             <div class="card rounded-4 border-0 shadow-sm">
                 <div class="card-body">
-                    <label for="empleadoScan" class="form-label">Número de empleado</label>
+                    <label for="empleadoScan" class="form-label fw-bold">Número de empleado</label>
                     <input id="empleadoScan" type="text" class="form-control w-75"
                            placeholder="Escanea tu número de empleado" autofocus />
                 </div>
@@ -103,10 +103,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Input confirmación -->
-                <input id="confirmacionInput" type="text" class="form-control d-none"
-                       placeholder="Escribe OK para confirmar o CANCELAR para reintentar" />
             </div>
         </div>
     </div>
@@ -245,7 +241,7 @@
             }
         });
 
-        // Escaneo de empleado receptor
+               // Escaneo de empleado receptor
         document.getElementById("empleadoReceptorInput").addEventListener("keyup", async e => {
             if (e.key !== "Enter") return;
             const code = e.target.value.trim();
@@ -254,34 +250,16 @@
             const data = await buscarEmpleado(code);
             if (data.success) {
                 empleadoRecibe = data.numero;
-                flujoEstado = "confirmacion";
+                flujoEstado = "cierre";
 
+                // Mostrar info receptor
                 document.getElementById("receptorNombre").textContent = data.nombre;
                 document.getElementById("receptorNumero").textContent = data.numero;
                 document.getElementById("receptorArea").textContent = data.area;
                 document.getElementById("receptorCategoria").textContent = data.categoria;
                 document.getElementById("empleadoReceptorInfo").classList.remove("d-none");
 
-                document.getElementById("confirmacionInput").classList.remove("d-none");
-                document.getElementById("confirmacionInput").focus();
-            } else {
-                mostrarAlerta("error", "Empleado no encontrado", data.error || "Verifica el número escaneado");
-
-                document.getElementById("empleadoReceptorInfo").classList.add("d-none");
-                document.getElementById("confirmacionInput").classList.add("d-none");
-                document.getElementById("empleadoReceptorInput").focus();
-            }
-
-            e.target.value = "";
-        });
-
-        // Confirmación OK / CANCELAR
-        document.getElementById("confirmacionInput").addEventListener("keyup", async e => {
-            if (e.key !== "Enter") return;
-            const decision = e.target.value.trim().toUpperCase();
-            e.target.value = "";
-
-            if (decision === "OK") {
+                // 🔹 Registrar pedido directamente
                 const result = await registrarPedido();
                 if (result.success) {
                     localStorage.setItem("registroSuccess", "true");
@@ -289,14 +267,17 @@
                 } else {
                     mostrarAlerta("error", "Error al registrar", result.error);
                 }
+
                 modalReceptor.hide();
-            } else if (decision === "CANCELAR") {
-                document.getElementById("empleadoReceptorInfo").classList.add("d-none");
-                document.getElementById("confirmacionInput").classList.add("d-none");
-                document.getElementById("empleadoReceptorInput").focus();
             } else {
-                mostrarAlerta("error", "Entrada inválida", "Escribe OK para confirmar o CANCELAR para reintentar");
+                mostrarAlerta("error", "Empleado receptor no encontrado", data.error || "Verifica el número escaneado");
+
+                // Resetear info y volver a pedir receptor
+                document.getElementById("empleadoReceptorInfo").classList.add("d-none");
+                document.getElementById("empleadoReceptorInput").focus();
             }
+
+            e.target.value = "";
         });
 
         // Toast de éxito al cargar

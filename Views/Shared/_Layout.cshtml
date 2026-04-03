@@ -3,57 +3,100 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SIQuim</title>
+    <title>@ViewData["Title"] - Sistema de Inventario de Químicos</title>
 
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="~/css/site.css" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="~/images/icono-tg.png" />
 
-
-
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet"
-          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
           crossorigin="anonymous">
 
-    <!-- Fuente Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa; /* gris claro de Bootstrap */
+            font-family: "Google Sans", sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Navbar oculto en Index */
+        .navbar-hidden {
+            transform: translateY(-100%);
+            transition: transform 0.3s ease-in-out;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1030;
+        }
+
+        /* Zona sensible al hover */
+        .navbar-hover-zone {
+            height: 20px; /* franja invisible arriba */
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1030;
+        }
+
+        /* Mostrar navbar al pasar el mouse */
+        .navbar-hover-zone:hover .navbar-hidden {
+            transform: translateY(0);
         }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-    <!-- Navbar -->
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-light border-bottom bg-white shadow-sm">
-            <div class="container">
-                <!-- Logo -->
-                <a class="navbar-brand" href="/">
-                    <img src="~/images/toyoda-gosei-logo.png" alt="Toyoda Gosei Logo" height="40">
-                </a>
+    @* Detectar si estamos en Index *@
+    @{
+        var path = Context.Request.Path.Value?.ToLower();
+    }
 
-                <!-- Links -->
-                <div class="navbar-collapse collapse">
-                    <ul class="navbar-nav mb-lg-0 mb-2 ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="/">Inicio</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="/Inventario/Materiales">Materiales</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="/Inventario/Pedidos">Pedidos</a>
-                        </li>
-                    </ul>
+    @if (path == "/" || path == "/inventario/index")
+    {
+        <!-- Navbar oculto con hover en Index -->
+        <header class="navbar-hover-zone">
+            <nav class="navbar navbar-expand-lg navbar-light border-bottom navbar-hidden bg-white shadow-sm">
+                <div class="container">
+                    <a class="navbar-brand" href="/">
+                        <img src="~/images/toyoda-gosei-logo.png" alt="Toyoda Gosei Logo" height="40">
+                    </a>
+                    <div class="navbar-collapse collapse">
+                        <ul class="navbar-nav nav-underline ms-auto">
+                            <li class="nav-item"><a class="nav-link" href="/Inventario/Index">Inicio</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/Inventario/Materiales">Materiales</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/Inventario/Pedidos">Pedidos</a></li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        </nav>
-    </header>
+            </nav>
+        </header>
+    }
+    else
+    {
+        <!-- Navbar normal en otras vistas -->
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-light border-bottom bg-white shadow-sm">
+                <div class="container">
+                    <a class="navbar-brand" href="/">
+                        <img src="~/images/toyoda-gosei-logo.png" alt="Toyoda Gosei Logo" height="40">
+                    </a>
+                    <div class="navbar-collapse collapse">
+                        <ul class="navbar-nav nav-underline ms-auto">
+                            <li class="nav-item"><a class="nav-link @(ViewData["Title"]?.ToString() == "Inicio" ? "active" : "")" href="/Inventario/Index">Inicio</a></li>
+                            <li class="nav-item"><a class="nav-link @(ViewData["Title"]?.ToString() == "Listado de Materiales" ? "active" : "")" href="/Inventario/Materiales">Materiales</a></li>
+                            <li class="nav-item"><a class="nav-link @(ViewData["Title"]?.ToString() == "Pedidos Realizados" ? "active" : "")" href="/Inventario/Pedidos">Pedidos</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+    }
 
     <!-- Contenido principal -->
     <main role="main" class="flex-grow-1 py-4">
@@ -65,13 +108,12 @@
     <!-- Footer -->
     <footer class="border-top text-muted mt-auto bg-white py-3">
         <div class="container text-center">
-            &copy; 2026 - Sistema de Inventarios de Mixing - By IoT Department
+            &copy; 2026 - Sistema de Inventarios de Químicos - By IoT Department
         </div>
     </footer>
 
-    <!-- Bootstrap JS (con Popper incluido) -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
             crossorigin="anonymous"></script>
 
     <!-- SweetAlert -->

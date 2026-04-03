@@ -154,9 +154,14 @@ namespace SIQuim.Controllers
                 fechaHora = p.FechaHora.ToString("dd/MM/yyyy HH:mm"),
                 entrega = p.ResponsableEntrega?.Nombre,
                 recibe = p.ResponsableRecibe?.Nombre,
-                materiales = p.Registros.Select(r =>
-                    $"{r.Material.Description} (Kanban: {r.Material.Kanban}, Qty: {r.Qty})"
-                ).ToList()
+                materiales = p.Registros.Select(r => new {
+                    nombre = r.Material.Description,
+                    kanban = r.Material.Kanban,
+                    cantidad = r.Qty,
+                    imagen = string.IsNullOrEmpty(r.Material.ImageUrl)
+                                ? "/images/materiales/default.png"
+                                : r.Material.ImageUrl
+                }).ToList()
             });
 
             return Json(new { data = result });

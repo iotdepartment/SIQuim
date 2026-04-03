@@ -14,15 +14,14 @@
     <!-- Card contenedor de la tabla -->
     <div class="card rounded-4 border-0 shadow-sm">
         <div class="card-body">
-            <div class="table-responsive">
-                <table id="materialesTable" class="table-striped table-bordered table align-middle">
-                    <thead class="table-light">
+            <div class="table-responsive rounded">
+                <table id="materialesTable" class="table-bordered table text-center align-middle">
+                    <thead class="table-dark">
                         <tr>
                             <th>Imagen</th>
                             <th>Descripción</th>
                             <th>Kanban</th>
                             <th>Part Number</th>
-                            <th>Vendor</th>
                             <th>UOM</th>
                             <th>StdPack</th>
                             <th>Costo</th>
@@ -52,36 +51,35 @@
                 responsive: true,
                 columns: [
                     {
-                        data: 'imageUrl',
+                        data: 'imageUrl', className: 'text-center',
                         render: function (data) {
                             let defaultImage = "/images/materiales/default.png";
                             let imgSrc = data && data.trim() !== "" ? data : defaultImage;
                             return `<img src="${imgSrc}" alt="Imagen" class="img-thumbnail" style="width:48px;height:48px;object-fit:cover;" />`;
                         }
                     },
-                    { data: 'description' },
-                    { data: 'kanban' },
-                    { data: 'partNumber' },
-                    { data: 'vendor' },
+                    { data: 'description', className: 'text-center'  },
+                    { data: 'kanban' , className: 'text-center'  },
+                    { data: 'partNumber' , className: 'text-center'  },
                     {
-                        data: 'uom',
+                        data: 'uom', className: 'text-center',
                         render: function (data) {
                             if (!data) return "";
                             let badgeClass = "bg-secondary";
 
                             switch (data.toUpperCase()) {
-                                case "GA": badgeClass = "bg-primary"; break;
-                                case "EA": badgeClass = "bg-success"; break;
-                                case "KG": badgeClass = "bg-warning text-dark"; break;
-                                case "LT": badgeClass = "bg-purple"; break;
+                                case "GA": badgeClass = "bg-gradient-blue"; break;
+                                case "EA": badgeClass = "bg-gradient-green"; break;
+                                case "KG": badgeClass = "bg-gradient-orange text-dark"; break;
+                                case "LT": badgeClass = "bg-gradient-purple"; break;
                             }
 
                             return `<span class="badge ${badgeClass}">${data}</span>`;
                         }
                     },
-                    { data: 'stdPack' },
-                    { data: 'cost' },
-                    { data: 'category' }
+                    { data: 'stdPack' , className: 'text-center' },
+                    { data: 'cost' , className: 'text-center' },
+                    { data: 'category' , className: 'text-center' }
                 ],
                 pageLength: 10,
                 language: {

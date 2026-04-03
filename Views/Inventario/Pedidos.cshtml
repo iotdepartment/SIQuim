@@ -9,21 +9,49 @@
             <h2 class="h5 fw-bold mb-0">📦 Listado de Pedidos</h2>
         </div>
     </div>
+
     <div class="card rounded-4 border-0 shadow-sm">
         <div class="card-body">
             <div class="table-responsive">
                 <table id="pedidosTable" class="table-striped table-bordered table align-middle">
-                    <thead class="table-light">
+                    <thead class="table-dark">
                         <tr>
                             <th>No. Pedido</th>
                             <th>Fecha/Hora</th>
-                            <th>Responsable Entrega</th>
-                            <th>Responsable Recibe</th>
-                            <th>Materiales</th>
+                            <th>TM Entrega</th>
+                            <th>TM Recibe</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para mostrar materiales -->
+<div class="modal fade" id="materialesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Materiales del Pedido</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table-bordered table-striped table align-middle">
+                        <thead class="table-secondary">
+                            <tr>
+                                <th>Imagen</th>
+                                <th>Nombre</th>
+                                <th>Kanban</th>
+                                <th>Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody id="materialesBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -40,19 +68,31 @@
 
     <script>
         $(document).ready(function () {
-            $('#pedidosTable').DataTable({
+            const pedidosTable = $('#pedidosTable').DataTable({
                 ajax: '/Inventario/GetPedidos',
                 responsive: true,
                 columns: [
-                    { data: 'id' },
-                    { data: 'fechaHora' },
-                    { data: 'entrega' },
-                    { data: 'recibe' },
+                    { data: 'id', className: 'text-center' },
+                    { data: 'fechaHora', className: 'text-center' },
                     {
-                        data: 'materiales',
+                        data: 'entrega', className: 'text-center',
                         render: function (data) {
-                            if (!data || data.length === 0) return "";
-                            return "<ul class='mb-0'>" + data.map(m => `<li>${m}</li>`).join("") + "</ul>";
+                            return data ? `<span class="badge bg-gradient-blue">${data}</span>` : "";
+                        }
+                    },
+                    {
+                        data: 'recibe', className: 'text-center',
+                        render: function (data) {
+                            return data ? `<span class="badge bg-gradient-green">${data}</span>` : "";
+                        }
+                    },
+                    {
+                        data: 'materiales', className: 'text-center',
+                        render: function (data) {
+                            return `<button class="btn btn-sm btn-primary bg-gradient-orange rounded-pill ver-materiales border-0"
+                                        data-materiales='${JSON.stringify(data)}'>
+                                        <i class="bi bi-box-seam"></i>
+                                    </button>`;
                         }
                     }
                 ],
@@ -60,6 +100,32 @@
                 language: {
                     url: "//cdn.datatables.net/plug-ins/2.3.7/i18n/es-MX.json"
                 }
+            });
+
+            // Evento para abrir el modal con materiales
+            $('#pedidosTable').on('click', '.ver-materiales', function () {
+                const materiales = $(this).data('materiales');
+                const tbody = $('#materialesBody');
+                tbody.empty();
+
+                if (materiales && materiales.length > 0) {
+                    materiales.forEach(m => {
+                        tbody.append(`
+                            <tr>
+                                <td class="text-center">
+                                    <img src="${m.imagen}" class="img-thumbnail" style="width:48px;height:48px;object-fit:cover;" />
+                                </td>
+                                <td>${m.nombre}</td>
+                                <td class="text-center">${m.kanban}</td>
+                                <td class="text-center">${m.cantidad}</td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    tbody.append(`<tr><td colspan="4" class="text-muted text-center">No hay materiales registrados</td></tr>`);
+                }
+
+                $('#materialesModal').modal('show');
             });
         });
     </script>
