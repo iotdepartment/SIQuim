@@ -26,6 +26,7 @@
                             <th>StdPack</th>
                             <th>Costo</th>
                             <th>Categoría</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -35,6 +36,46 @@
     </div>
 </div>
 
+<div class="modal fade" id="historialModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Historial del Material</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <div id="infoMaterial" class="mb-3 p-3 rounded border bg-light d-flex gap-3 align-items-center">
+                    <img id="infoImagen" src="" class="rounded" style="width:60px;height:60px;object-fit:cover;">
+                    <div>
+                        <h5 id="infoNombre" class="fw-bold mb-1"></h5>
+                        <div class="text-muted small">
+                            <span id="infoKanban"></span> |
+                            <span id="infoPart"></span> |
+                            <span id="infoCategoria"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <table id="historialTable" class="table table-bordered table-striped align-middle">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>No. Pedido</th>
+                            <th>Fecha</th>
+                            <th>TM Entrega</th>
+                            <th>TM Recibe</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+           
+        </div>
+    </div>
+</div>
 @section Scripts {
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
@@ -79,13 +120,76 @@
                     },
                     { data: 'stdPack' , className: 'text-center' },
                     { data: 'cost' , className: 'text-center' },
-                    { data: 'category' , className: 'text-center' }
+                    { data: 'category' , className: 'text-center' },
+                    {
+                        data: 'id',
+                        className: 'text-center',
+                        render: function (id, type, row) {
+                            return `
+                                <button class="btn btn-sm bg-gradient-blue text-white ver-historial rounded-pill"
+                                    data-id="${id}"
+                                    data-nombre="${row.description}"
+                                    data-kanban="${row.kanban}"
+                                    data-part="${row.partNumber}"
+                                    data-categoria="${row.category}"
+                                    data-imagen="${row.imageUrl}">
+                                    <i class="bi bi-clock-history"></i>
+                                </button>
+                            `;
+                        }
+                    }
                 ],
                 pageLength: 10,
                  language: {
                     url: "https://cdn.datatables.net/plug-ins/2.3.7/i18n/es-MX.json"
                 }
             });
+        });
+
+                $('#materialesTable').on('click', '.ver-historial', function () {
+
+            let idMaterial = $(this).data('id');
+
+            // Datos del material
+            let nombre = $(this).data('nombre');
+            let kanban = $(this).data('kanban');
+            let part = $(this).data('part');
+            let categoria = $(this).data('categoria');
+            let imagen = $(this).data('imagen') || "/images/materiales/default.png";
+
+            // Llenar info en el modal
+            $('#infoImagen').attr('src', imagen);
+            $('#infoNombre').text(nombre);
+            $('#infoKanban').text("Kanban: " + kanban);
+            $('#infoPart').text("Part Number: " + part);
+            $('#infoCategoria').text("Categoría: " + categoria);
+
+            // Destruir DataTable previo si existe
+            if ($.fn.DataTable.isDataTable('#historialTable')) {
+                $('#historialTable').DataTable().clear().destroy();
+            }
+
+            // Crear DataTable del historial
+            $('#historialTable').DataTable({
+                ajax: {
+                    url: '/Inventario/GetHistorialMaterial',
+                    data: { idMaterial: idMaterial }
+                },
+                columns: [
+                    { data: 'pedidoId', className: 'text-center' },
+                    { data: 'fecha', className: 'text-center' },
+                    { data: 'entrega', className: 'text-center' },
+                    { data: 'recibe', className: 'text-center' },
+                    { data: 'cantidad', className: 'text-center fw-bold' }
+                ],
+                pageLength: 5,
+                searching: false,
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/2.3.7/i18n/es-MX.json"
+                }
+            });
+
+            $('#historialModal').modal('show');
         });
     </script>
 }

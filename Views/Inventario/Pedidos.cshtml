@@ -13,14 +13,17 @@
     <div class="card rounded-4 border-0 shadow-sm">
         <div class="card-body">
             <div class="table-responsive">
-                <table id="pedidosTable" class="table-striped table-bordered table align-middle">
+                <table id="pedidosTable" class="table-bordered table align-middle">
                     <thead class="table-dark">
                         <tr>
-                            <th>No. Pedido</th>
-                            <th>Fecha/Hora</th>
-                            <th>TM Entrega</th>
-                            <th>TM Recibe</th>
-                            <th>Acciones</th>
+                            <th class="">No. Pedido</th>
+                            <th class="">Fecha/Hora</th>
+                            <th class="">TM Entrega</th>
+                            <th class="">TM Recibe</th>
+                            <th class="text-center">Material</th>
+                            <th class="">Cantidad</th>
+                            <th class="">Kanban</th>
+
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -31,7 +34,7 @@
 </div>
 
 <!-- Modal para mostrar materiales -->
-<div class="modal fade" id="materialesModal" tabindex="-1" aria-hidden="true">
+@* <div class="modal fade" id="materialesModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
             <div class="modal-header">
@@ -55,7 +58,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> *@
 
 @section Scripts {
     <!-- jQuery -->
@@ -71,31 +74,34 @@
             const pedidosTable = $('#pedidosTable').DataTable({
                 ajax: '/Inventario/GetPedidos',
                 responsive: true,
-                columns: [
-                    { data: 'id', className: 'text-center' },
-                    { data: 'fechaHora', className: 'text-center' },
-                    {
-                        data: 'entrega', className: 'text-center',
-                        render: function (data) {
-                            return data ? `<span class="badge bg-gradient-blue">${data}</span>` : "";
-                        }
-                    },
-                    {
-                        data: 'recibe', className: 'text-center',
-                        render: function (data) {
-                            return data ? `<span class="badge bg-gradient-green">${data}</span>` : "";
-                        }
-                    },
-                    {
-                        data: 'materiales', className: 'text-center',
-                        render: function (data) {
-                            return `<button class="btn btn-sm btn-primary bg-gradient-orange rounded-pill ver-materiales border-0"
-                                        data-materiales='${JSON.stringify(data)}'>
-                                        <i class="bi bi-box-seam"></i>
-                                    </button>`;
-                        }
-                    }
-                ],
+                        columns: [
+            { data: 'id', className: 'text-center  fw-bold' },
+            { data: 'fechaHora', className: 'text-center ' },
+
+            {
+                data: 'entrega',
+                className: 'text-center',
+                render: d => d ? `<span class="badge bg-gradient-blue">${d}</span>` : ""
+            },
+            {
+                data: 'recibe',
+                className: 'text-center',
+                render: d => d ? `<span class="badge bg-gradient-green">${d}</span>` : ""
+            },
+
+            // Nombre del material
+            { data: 'nombre', className: 'fw-bold' },
+
+
+            // Cantidad
+            {
+                data: 'cantidad',
+                className: 'text-center'
+            },
+
+            // Kanban
+            { data: 'kanban', className: 'text-center' },
+        ],
                 pageLength: 10,
                 language: {
                     url: "https://cdn.datatables.net/plug-ins/2.3.7/i18n/es-MX.json"

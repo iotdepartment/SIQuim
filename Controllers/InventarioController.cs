@@ -136,6 +136,32 @@ namespace SIQuim.Controllers
             return View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetHistorialMaterial(int idMaterial)
+        {
+            var historial = await _context.Pedidos
+                .Include(p => p.ResponsableEntrega)
+                .Include(p => p.ResponsableRecibe)
+                .Include(p => p.Registros)
+                    .ThenInclude(r => r.Material)
+                .Where(p => p.Registros.Any(r => r.MaterialId == idMaterial))
+                .OrderByDescending(p => p.FechaHora)
+                .Select(p => new
+                {
+                    pedidoId = p.Id,
+                    fecha = p.FechaHora.ToString("dd/MM/yyyy HH:mm"),
+                    entrega = p.ResponsableEntrega.Nombre,
+                    recibe = p.ResponsableRecibe.Nombre,
+                    cantidad = p.Registros
+                                .Where(r => r.MaterialId == idMaterial)
+                                .Select(r => r.Qty)
+                                .FirstOrDefault()
+                })
+                .ToListAsync();
+
+            return Json(new { data = historial });
+        }
+
         // Endpoint JSON para DataTables
         [HttpGet]
         public async Task<IActionResult> GetPedidos()
@@ -148,21 +174,21 @@ namespace SIQuim.Controllers
                 .OrderByDescending(p => p.FechaHora)
                 .ToListAsync();
 
-            var result = pedidos.Select(p => new
+            var result = pedidos.SelectMany(p => p.Registros.Select(r => new
             {
                 id = p.Id,
                 fechaHora = p.FechaHora.ToString("dd/MM/yyyy HH:mm"),
                 entrega = p.ResponsableEntrega?.Nombre,
                 recibe = p.ResponsableRecibe?.Nombre,
-                materiales = p.Registros.Select(r => new {
-                    nombre = r.Material.Description,
-                    kanban = r.Material.Kanban,
-                    cantidad = r.Qty,
-                    imagen = string.IsNullOrEmpty(r.Material.ImageUrl)
-                                ? "/images/materiales/default.png"
-                                : r.Material.ImageUrl
-                }).ToList()
-            });
+
+                // Material individual
+                nombre = r.Material.Description,
+                kanban = r.Material.Kanban,
+                cantidad = r.Qty,
+                imagen = string.IsNullOrEmpty(r.Material.ImageUrl)
+                            ? "/images/materiales/default.png"
+                            : r.Material.ImageUrl
+            })).ToList();
 
             return Json(new { data = result });
         }
